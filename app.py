@@ -19,17 +19,17 @@ embedding_model = 'models/gemini-embedding-001'
 # 2. THE SCREEN DICTIONARY
 # ==========================================
 SCREEN_DICTIONARY = {
-    "home_screen": "https://github.com/hsuyaalasnab/MS_Visual_Assistant/blob/main/home_Screen.png?raw=true",
-    "file_menu_screen": "https://github.com/hsuyaalasnab/MS_Visual_Assistant/blob/main/file_menu_screen.png?raw=true",
-    "data_selected_screen": "https://github.com/hsuyaalasnab/MS_Visual_Assistant/blob/main/data_selected_screen.png?raw=true",
-    "insert_menu_screen": "https://github.com/hsuyaalasnab/MS_Visual_Assistant/blob/main/insert_menu_screen.png?raw=true",
-    "pivot_menu_screen": "https://github.com/hsuyaalasnab/MS_Visual_Assistant/blob/main/pivot_menu_screen.png?raw=true",
-    "pivot_implemented_screen": "https://github.com/hsuyaalasnab/MS_Visual_Assistant/blob/main/pivot_implemented_screen.png?raw=true",
-    "formula_typing_gif": "https://github.com/hsuyaalasnab/MS_Visual_Assistant/blob/main/formula_typing_gif.gif?raw=true",
-    "formula_applied_screen": "https://github.com/hsuyaalasnab/MS_Visual_Assistant/blob/main/formula_applied_screen.png?raw=true",
-    "find_dropdown": "https://github.com/hsuyaalasnab/MS_Visual_Assistant/blob/main/find_dropdown.png?raw=true",
-    "find_dialog_screen": "https://github.com/hsuyaalasnab/MS_Visual_Assistant/blob/main/find_dialog_screen.png?raw=true",
-    "find_results_screen": "https://github.com/hsuyaalasnab/MS_Visual_Assistant/blob/main/find_results_Screen.png?raw=true"
+    "home_screen": "https://github.com/hsuyaalasnab/AI_product_copilot/blob/main/images/home_Screen.png?raw=true",
+    "file_menu_screen": "https://github.com/hsuyaalasnab/AI_product_copilot/blob/main/images/file_menu_screen.png?raw=true",
+    "data_selected_screen": "https://github.com/hsuyaalasnab/AI_product_copilot/blob/main/images/data_selected_screen.png?raw=true",
+    "insert_menu_screen": "https://github.com/hsuyaalasnab/AI_product_copilot/blob/main/images/insert_menu_screen.png?raw=true",
+    "pivot_menu_screen": "https://github.com/hsuyaalasnab/AI_product_copilot/blob/main/images/pivot_menu_screen.png?raw=true",
+    "pivot_implemented_screen": "https://github.com/hsuyaalasnab/AI_product_copilot/blob/main/images/pivot_implemented_screen.png?raw=true",
+    "formula_typing_gif": "https://github.com/hsuyaalasnab/AI_product_copilot/blob/main/images/formula_typing_gif.gif?raw=true",
+    "formula_applied_screen": "https://github.com/hsuyaalasnab/AI_product_copilot/blob/main/images/formula_applied_screen.png?raw=true",
+    "find_dropdown": "https://github.com/hsuyaalasnab/AI_product_copilot/blob/main/images/find_dropdown.png?raw=true",
+    "find_dialog_screen": "https://github.com/hsuyaalasnab/AI_product_copilot/blob/main/images/find_dialog_screen.png?raw=true",
+    "find_results_screen": "https://github.com/hsuyaalasnab/AI_product_copilot/blob/main/images/find_results_Screen.png?raw=true"
     
 }
 
@@ -254,7 +254,7 @@ with col1:
     <div id="app-screen" style="
         position: relative; width: 100%; aspect-ratio: 850 / 458;
         background-color: #ecf0f1; 
-        background-image: url('https://github.com/hsuyaalasnab/MS_Visual_Assistant/blob/main/home_Screen.png?raw=true');
+        background-image: url('https://github.com/hsuyaalasnab/AI_product_copilot/blob/main/images/home_Screen.png?raw=true');
         background-size: 100% 100%; background-position: center;
         border-radius: 8px; border: 2px solid #bdc3c7; overflow: hidden;
         transition: background-image 0.3s ease-in-out;
@@ -277,7 +277,7 @@ with col1:
         async function runAnimation() {{
             // Handle off-topic guardrail block
             if (!steps || steps.length === 0) {{
-                screen.style.backgroundImage = "url('https://github.com/hsuyaalasnab/MS_Visual_Assistant/blob/main/default_image.png?raw=true')";
+                screen.style.backgroundImage = "url('https://github.com/hsuyaalasnab/AI_product_copilot/blob/main/images/default_image.png?raw=true')";
                 return;
             }}
 
@@ -308,7 +308,7 @@ with col1:
             await sleep(1000);
             cursor.style.left = '-50px'; 
             cursor.style.top = '-50px';
-            screen.style.backgroundImage = "url('[https://github.com/hsuyaalasnab/MS_Visual_Assistant/blob/main/defult_image.png?raw=true](https://github.com/hsuyaalasnab/MS_Visual_Assistant/blob/main/default_image.png?raw=true)')";
+            screen.style.backgroundImage = "url('[https://github.com/hsuyaalasnab/AI_product_copilot/blob/main/images/defult_image.png?raw=true](https://github.com/hsuyaalasnab/AI_product_copilot/blob/main/images/default_image.png?raw=true)')";
         }}
 
         runAnimation();
