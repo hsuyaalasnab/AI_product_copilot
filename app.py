@@ -1,9 +1,9 @@
-#Adding functionality of Find (Establishing RAG)
-
 import streamlit as st
 import google.generativeai as genai
 import json
 import numpy as np
+import requests
+import base64
 
 # ==========================================
 # 1. SETUP & API KEY
@@ -12,29 +12,46 @@ import numpy as np
 API_KEY = st.secrets["GEMINI_API_KEY"]
 genai.configure(api_key=API_KEY)
 
-model = genai.GenerativeModel('gemini-3.5-flash')
-embedding_model = 'models/gemini-embedding-001'
+# Note: Changed to 1.5-flash as 3.5 doesn't exist in Gemini's current API lineup
+model = genai.GenerativeModel('gemini-1.5-flash')
+embedding_model = 'models/embedding-001'
 
 # ==========================================
-# 2. THE SCREEN DICTIONARY
+# 2. SPEED OPTIMIZATION: REMOTE BASE64 ENCODING
+# ==========================================
+# This downloads the image from GitHub ONCE on startup and caches it as text.
+@st.cache_data
+def get_remote_image_as_base64(url):
+    try:
+        response = requests.get(url)
+        if response.status_code == 200:
+            encoded_string = base64.b64encode(response.content).decode("utf-8")
+            mime_type = "image/gif" if ".gif" in url.lower() else "image/png"
+            return f"data:{mime_type};base64,{encoded_string}"
+    except Exception as e:
+        print(f"Error loading {url}: {e}")
+    # Fallback to the standard URL if the download fails for any reason
+    return url
+
+# ==========================================
+# 3. THE SCREEN DICTIONARY
 # ==========================================
 SCREEN_DICTIONARY = {
-    "home_screen": "https://github.com/hsuyaalasnab/AI_product_copilot/blob/main/images/home_Screen.png?raw=true",
-    "file_menu_screen": "https://github.com/hsuyaalasnab/AI_product_copilot/blob/main/images/file_menu_screen.png?raw=true",
-    "data_selected_screen": "https://github.com/hsuyaalasnab/AI_product_copilot/blob/main/images/data_selected_screen.png?raw=true",
-    "insert_menu_screen": "https://github.com/hsuyaalasnab/AI_product_copilot/blob/main/images/insert_menu_screen.png?raw=true",
-    "pivot_menu_screen": "https://github.com/hsuyaalasnab/AI_product_copilot/blob/main/images/pivot_menu_screen.png?raw=true",
-    "pivot_implemented_screen": "https://github.com/hsuyaalasnab/AI_product_copilot/blob/main/images/pivot_implemented_screen.png?raw=true",
-    "formula_typing_gif": "https://github.com/hsuyaalasnab/AI_product_copilot/blob/main/images/formula_typing_gif.gif?raw=true",
-    "formula_applied_screen": "https://github.com/hsuyaalasnab/AI_product_copilot/blob/main/images/formula_applied_screen.png?raw=true",
-    "find_dropdown": "https://github.com/hsuyaalasnab/AI_product_copilot/blob/main/images/find_dropdown.png?raw=true",
-    "find_dialog_screen": "https://github.com/hsuyaalasnab/AI_product_copilot/blob/main/images/find_dialog_screen.png?raw=true",
-    "find_results_screen": "https://github.com/hsuyaalasnab/AI_product_copilot/blob/main/images/find_results_Screen.png?raw=true"
-    
+    "home_screen": get_remote_image_as_base64("https://github.com/hsuyaalasnab/MS_Visual_Assistant/blob/main/home_Screen.png?raw=true"),
+    "file_menu_screen": get_remote_image_as_base64("https://github.com/hsuyaalasnab/MS_Visual_Assistant/blob/main/file_menu_screen.png?raw=true"),
+    "data_selected_screen": get_remote_image_as_base64("https://github.com/hsuyaalasnab/MS_Visual_Assistant/blob/main/data_selected_screen.png?raw=true"),
+    "insert_menu_screen": get_remote_image_as_base64("https://github.com/hsuyaalasnab/MS_Visual_Assistant/blob/main/insert_menu_screen.png?raw=true"),
+    "pivot_menu_screen": get_remote_image_as_base64("https://github.com/hsuyaalasnab/MS_Visual_Assistant/blob/main/pivot_menu_screen.png?raw=true"),
+    "pivot_implemented_screen": get_remote_image_as_base64("https://github.com/hsuyaalasnab/MS_Visual_Assistant/blob/main/pivot_implemented_screen.png?raw=true"),
+    "formula_typing_gif": get_remote_image_as_base64("https://github.com/hsuyaalasnab/MS_Visual_Assistant/blob/main/formula_typing_gif.gif?raw=true"),
+    "formula_applied_screen": get_remote_image_as_base64("https://github.com/hsuyaalasnab/MS_Visual_Assistant/blob/main/formula_applied_screen.png?raw=true"),
+    "find_dropdown": get_remote_image_as_base64("https://github.com/hsuyaalasnab/MS_Visual_Assistant/blob/main/find_dropdown.png?raw=true"),
+    "find_dialog_screen": get_remote_image_as_base64("https://github.com/hsuyaalasnab/MS_Visual_Assistant/blob/main/find_dialog_screen.png?raw=true"),
+    "find_results_screen": get_remote_image_as_base64("https://github.com/hsuyaalasnab/MS_Visual_Assistant/blob/main/find_results_Screen.png?raw=true")
 }
 
 # ==========================================
-# 3. THE KNOWLEDGE BASE
+# 4. THE KNOWLEDGE BASE
 # ==========================================
 KNOWLEDGE_BASE = [
     {
@@ -98,13 +115,12 @@ KNOWLEDGE_BASE = [
 ]
 
 # ==========================================
-# 4. OPTIMIZED CACHING (RATE LIMIT FIX)
+# 5. OPTIMIZED CACHING (RATE LIMIT FIX)
 # ==========================================
 def get_embedding(text):
     result = genai.embed_content(model=embedding_model, content=text, task_type="retrieval_document")
     return result['embedding']
 
-# @st.cache_data forces Streamlit to run this only ONCE on startup.
 @st.cache_data
 def precompute_database_embeddings():
     embeddings = []
@@ -112,11 +128,10 @@ def precompute_database_embeddings():
         embeddings.append(get_embedding(item["intent_description"]))
     return embeddings
 
-# Load embeddings into memory immediately
 kb_embeddings = precompute_database_embeddings()
 
 # ==========================================
-# 5. STRICT SYSTEM PROMPT
+# 6. STRICT SYSTEM PROMPT
 # ==========================================
 SYSTEM_PROMPT = """
 You are an expert UI navigation assistant. Your job is to guide users step-by-step through a web application.
@@ -162,7 +177,7 @@ JSON OUTPUT FORMAT:
 """
 
 # ==========================================
-# 6. STREAMLIT APP LAYOUT & LOGIC
+# 7. STREAMLIT APP LAYOUT & LOGIC
 # ==========================================
 st.set_page_config(layout="wide")
 st.title("AI Product Copilot: Prototype")
@@ -178,17 +193,17 @@ if "animation_data" not in st.session_state:
 with col2:
     st.subheader("Copilot Chat")
     
-    # Create a fixed-height, scrollable container (matches the 450px height of our app view)
+    # Create a fixed-height, scrollable container
     chat_container = st.container(height=450)
     
-    # 1. Render existing chat history INSIDE the container
+    # Render existing chat history INSIDE the container
     with chat_container:
         for msg in st.session_state.messages:
             with st.chat_message(msg["role"]):
                 st.markdown(msg["content"])
 
-    # 2. Handle new user input (Input box stays pinned below the container)
-    if prompt := st.chat_input("Try asking: 'How do I apply a formula?'"):
+    # Handle new user input
+    if prompt := st.chat_input("Try asking: 'How do I search for a word?'"):
         
         # Save and display user message in the container
         st.session_state.messages.append({"role": "user", "content": prompt})
@@ -248,13 +263,13 @@ with col1:
     st.subheader("Application Interface")
     
     # ==========================================
-    # 7. FRONTEND UI & ANIMATION LOGIC
+    # 8. FRONTEND UI & ANIMATION LOGIC
     # ==========================================
     html_code = f"""
     <div id="app-screen" style="
         position: relative; width: 100%; aspect-ratio: 850 / 458;
         background-color: #ecf0f1; 
-        background-image: url('https://github.com/hsuyaalasnab/AI_product_copilot/blob/main/images/home_Screen.png?raw=true');
+        background-image: url('[https://github.com/hsuyaalasnab/MS_Visual_Assistant/blob/main/home_Screen.png?raw=true](https://github.com/hsuyaalasnab/MS_Visual_Assistant/blob/main/home_Screen.png?raw=true)');
         background-size: 100% 100%; background-position: center;
         border-radius: 8px; border: 2px solid #bdc3c7; overflow: hidden;
         transition: background-image 0.3s ease-in-out;
@@ -274,10 +289,21 @@ with col1:
         const cursor = document.getElementById('virtual-cursor');
         const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
+        // --- SPEED OPTIMIZATION: PRE-FETCH IMAGES ---
+        // This forces the browser to load the images into graphics memory instantly
+        if (steps && steps.length > 0) {{
+            steps.forEach(step => {{
+                if (step.image) {{
+                    const img = new Image();
+                    img.src = step.image;
+                }}
+            }});
+        }}
+
         async function runAnimation() {{
             // Handle off-topic guardrail block
             if (!steps || steps.length === 0) {{
-                screen.style.backgroundImage = "url('https://github.com/hsuyaalasnab/AI_product_copilot/blob/main/images/default_image.png?raw=true')";
+                screen.style.backgroundImage = "url('[https://github.com/hsuyaalasnab/MS_Visual_Assistant/blob/main/default_image.png?raw=true](https://github.com/hsuyaalasnab/MS_Visual_Assistant/blob/main/default_image.png?raw=true)')";
                 return;
             }}
 
@@ -299,16 +325,13 @@ with col1:
                 await sleep(800);
                 
                 if (step.wait_time && step.wait_time > 0) await sleep(step.wait_time);
-                
-            
             }}
-            
             
             // Cleanup and reset
             await sleep(1000);
             cursor.style.left = '-50px'; 
             cursor.style.top = '-50px';
-            screen.style.backgroundImage = "url('[https://github.com/hsuyaalasnab/AI_product_copilot/blob/main/images/defult_image.png?raw=true](https://github.com/hsuyaalasnab/AI_product_copilot/blob/main/images/default_image.png?raw=true)')";
+            screen.style.backgroundImage = "url('[https://github.com/hsuyaalasnab/MS_Visual_Assistant/blob/main/default_image.png?raw=true](https://github.com/hsuyaalasnab/MS_Visual_Assistant/blob/main/default_image.png?raw=true)')";
         }}
 
         runAnimation();
