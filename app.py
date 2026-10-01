@@ -12,9 +12,8 @@ import base64
 API_KEY = st.secrets["GEMINI_API_KEY"]
 genai.configure(api_key=API_KEY)
 
-# Note: Changed to 1.5-flash as 3.5 doesn't exist in Gemini's current API lineup
-model = genai.GenerativeModel('gemini-1.5-flash')
-embedding_model = 'models/embedding-001'
+model = genai.GenerativeModel('gemini-3.5-flash')
+embedding_model = 'models/gemini-embedding-001'
 
 # ==========================================
 # 2. SPEED OPTIMIZATION: REMOTE BASE64 ENCODING
